@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Wordle Clone</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #121213;
+      color: #ffffff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 30px;
+    }
+
+    h1 {
+      margin-bottom: 20px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(5, 60px);
+      gap: 5px;
+      margin-bottom: 20px;
+    }
+
+    .row {
+      display: contents;
+    }
+
+    .cell {
+      width: 60px;
+      height: 60px;
+      border: 2px solid #3a3a3c;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 24px;
+      font-weight: bold;
+      text-transform: uppercase;
+      background-color: #121213;
+      color: white;
+    }
+
+    .correct {
+      background-color: #538d4e;
+      border-color: #538d4e;
+    }
+
+    .present {
+      background-color: #b59f3b;
+      border-color: #b59f3b;
+    }
+
+    .absent {
+      background-color: #3a3a3c;
+      border-color: #3a3a3c;
+    }
+
+    input {
+      padding: 10px;
+      font-size: 20px;
+      width: 200px;
+      text-align: center;
+      text-transform: uppercase;
+      margin-bottom: 15px;
+    }
+
+    button {
+      padding: 10px 20px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    .message {
+      margin-top: 20px;
+      font-size: 20px;
+    }
+
+    .hidden {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <h1>Wordle Clone</h1>
+  <div id="grid" class="grid"></div>
+
+  <input type="text" id="guessInput" maxlength="5" placeholder="Enter word" />
+  <button onclick="submitGuess()">Guess</button>
+
+  <div class="message" id="message"></div>
+
+  <script>
+    const wordList = [
+      "about", "above", "abuse", "actor", "acute", "admit", "adopt", "adult", "after", "again",
+      "apple", "apply", "argue", "award", "baker", "beach", "billy", "birth", "black", "block",
+      "bread", "break", "bring", "broke", "build", "catch", "cause", "chain", "check", "chest",
+      "child", "clean", "close", "count", "craft", "cross", "crowd", "crown", "cycle", "daily" 
+    ];
+
+    // Pick a random word from the word list
+    const targetWord = wordList[Math.floor(Math.random() * wordList.length)];
+    let currentRow = 0;
+    const maxRows = 6;
+
+    const gridElement = document.getElementById('grid');
+    const messageElement = document.getElementById('message');
+
+    // Generate the grid
+    function generateGrid() {
+      for (let row = 0; row < maxRows; row++) {
+        const rowElement = document.createElement('div');
+        rowElement.classList.add('row');
+        for (let col = 0; col < 5; col++) {
+          const cellElement = document.createElement('div');
+          cellElement.classList.add('cell');
+          rowElement.appendChild(cellElement);
+        }
+        gridElement.appendChild(rowElement);
+      }
+    }
+
+    generateGrid();
+
+    // Handle guess submission
+    function submitGuess() {
+      const guessInput = document.getElementById('guessInput');
+      const guess = guessInput.value.toLowerCase();
+
+      if (guess.length !== 5) {
+        messageElement.textContent = 'Please enter a 5-letter word.';
+        return;
+      }
+
+      if (!wordList.includes(guess)) {
+        messageElement.textContent = 'Not a valid word.';
+        return;
+      }
+
+      const rowElement = gridElement.children[currentRow];
+      const cells = rowElement.children;
+
+      // Check the guess and update the grid
+      for (let i = 0; i < 5; i++) {
+        const letter = guess[i];
+        const cell = cells[i];
+        if (letter === targetWord[i]) {
+          cell.classList.add('correct');
+        } else if (targetWord.includes(letter)) {
+          cell.classList.add('present');
+        } else {
+          cell.classList.add('absent');
+        }
+        cell.textContent = letter;
+      }
+
+      if (guess === targetWord) {
+        messageElement.textContent = 'Congratulations! You guessed the word!';
+        return;
+      }
+
+      currentRow++;
+
+      if (currentRow === maxRows) {
+        messageElement.textContent = `Game over! The word was "${targetWord}".`;
+      }
+
+      guessInput.value = '';
+      guessInput.focus();
+    }
+  </script>
+</body>
+</html>
